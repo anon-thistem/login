@@ -1,0 +1,56 @@
+# ~/.os/HostScheme — Rainbow stripes per host + restore previous colors
+
+# only in interactive terminals
+[[ -t 1 ]] || return 0
+case "${TERM,,}" in dumb|linux) return 0 ;; esac
+
+# --- OSC helpers ---
+osc_fg()     { printf '\e]10;%s\a' "$1"; }
+osc_bg()     { printf '\e]11;%s\a' "$1"; }
+osc_cursor() { printf '\e]12;%s\a' "$1"; }
+
+# Query current colors so we can restore them on logout
+_osc_query(){ printf '\e]%s;?\a' "$1" > /dev/tty; IFS= read -r -d $'\a' -t 0.3 _r < /dev/tty || return 1; printf '%s\n' "$_r"; }
+_norm_hex(){ local s="$1" r g b; s="${s##*;}"; 
+  [[ "$s" =~ ^#([0-9A-Fa-f]{6})$ ]] && { printf '#%s\n' "${BASH_REMATCH[1]}"; return 0; }
+  [[ "$s" =~ ^rgb:([0-9A-Fa-f]{2,4})/([0-9A-Fa-f]{2,4})/([0-9A-Fa-f]{2,4})$ ]] && {
+    r="${BASH_REMATCH[1]:0:2}"; g="${BASH_REMATCH[2]:0:2}"; b="${BASH_REMATCH[3]:0:2}"
+    printf '#%s%s%s\n' "$r" "$g" "$b"; return 0; }
+  return 1; }
+
+save_prev(){
+  [[ -n "$__HS_SAVED" ]] && return 0
+  export __HS_PREV_FG="$(_norm_hex "$(_osc_query 10)" || true)"
+  export __HS_PREV_BG="$(_norm_hex "$(_osc_query 11)" || true)"
+  export __HS_PREV_CU="$(_norm_hex "$(_osc_query 12)" || true)"
+  export __HS_SAVED=1
+}
+restore_prev(){
+  if [[ -n "$__HS_PREV_FG$__HS_PREV_BG$__HS_PREV_CU" ]]; then
+    [[ -n "$__HS_PREV_FG" ]] && osc_fg "$__HS_PREV_FG"
+    [[ -n "$__HS_PREV_BG" ]] && osc_bg "$__HS_PREV_BG"
+    [[ -n "$__HS_PREV_CU" ]] && osc_cursor "$__HS_PREV_CU"
+  else
+    printf '\e]110\a\e]111\a\e]112\a'   # fallback: terminal defaults
+  fi
+}
+
+# --- Rainbow mapping (deep BG for readability, light FG, colored cursor) ---
+# theta=RED, talos4=ORANGE, alpha=YELLOW, beta=GREEN, gamma=BLUE, delta=VIOLET
+case "$HOSTNAME" in
+  theta)  BG="#2B0000"; FG="#FFECEC"; CUR="#FF6B6B" ;;  # RED
+  talos4) BG="#301700"; FG="#FFE3B0"; CUR="#FFA343" ;;  # ORANGE
+  alpha)  BG="#2B2A00"; FG="#FFF6B0"; CUR="#FFD84D" ;;  # YELLOW
+  beta)   BG="#001F12"; FG="#BFF5D0"; CUR="#41D37E" ;;  # GREEN
+  gamma)  BG="#001B33"; FG="#CFE8FF"; CUR="#64B5F6" ;;  # BLUE
+  delta)  BG="#2A0033"; FG="#F0D9FF"; CUR="#C77DFF" ;;  # VIOLET
+  *)      BG="#2A0000"; FG="#FFEFEF"; CUR="#FFAAAA" ;;  # fallback = red-ish
+esac
+
+# apply & restore
+save_prev
+osc_bg "$BG"; osc_fg "$FG"; osc_cursor "$CUR"
+trap 'restore_prev' EXIT
+
+# tmux users (>=3.2): add to ~/.tmux.conf →  set -g allow-passthrough on
+

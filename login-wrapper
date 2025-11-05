@@ -1,0 +1,21 @@
+
+opwd=$(pwd)
+
+### configs="SSH-Agent Aliases Functions Environment PostLogin"
+# . "${HOME}/.os/${conf}/SSH-Agent"
+# configs="HostScheme Aliases Functions Environment PostLogin"
+configs="Aliases Functions Environment PostLogin"
+
+for conf in ${configs}
+do
+  if [ -f ${HOME}/.os/${conf} ]
+  then
+    . "${HOME}/.os/${conf}" #> /dev/null
+  else
+    printf "HUH  %-25s\n" "${HOME}/.os/${conf}"
+  fi
+
+done
+
+cd ${opwd}
+

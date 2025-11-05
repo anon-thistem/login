@@ -1,0 +1,30 @@
+
+# printf "sourcing => %-25s\n" "PostLogin"
+
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+cols=$(tput cols)
+
+if [ -f ~/.plan ]
+then
+  printf '%*s\n' "$(tput -T xterm-256color cols)" '' | tr ' ' '-'
+
+  cat ~/.plan
+
+  printf '%*s\n' "$(tput -T xterm-256color cols)" '' | tr ' ' '-'
+else
+  echo "no plan!"
+fi
+# printf "setup completed!\n"
+
+printf "checking .os status\n"
+cd ~/.os
+git status
+git status -sb
+cd -
+
+printf "\n"
+

@@ -1,0 +1,29 @@
+
+# printf "sourcing => %-25s" "Aliases"
+
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias c="clear;printf '%*s\n' "$(tput -T xterm-256color cols)" '' | tr ' ' '-'"
+alias d='date +'%Y%m%d_%H%M%S''
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias firefox='firefox >/dev/null 2>&1 &'
+alias grep='grep --color=auto'
+alias inet="ip a | egrep '^[0-9].*|inet'"
+# alias ls='ls -lF --color=auto'
+# alias la='ls -alF --color=auto'
+alias ls='ls -lF'
+alias la='ls -alF'
+alias lsp='ls -1 /proc | grep -v ^[0-9]|sort'
+alias systemctl='systemctl --no-pager'
+alias _time="date '+%H:%M:%S'"
+alias _uname='uname --kernel-name --kernel-release --kernel-version --machine --operating-system'
+alias up='uptime -p'
+# alias xterm='xterm -fn 9x15 -ls -sb -sl 10000000 >/dev/null 2>&1 &'
+alias xterm='xterm -fn r-10x20 -ls -sb -sl 10000000 >/dev/null 2>&1 &'
+
+# printf " ... done!\n" 
+

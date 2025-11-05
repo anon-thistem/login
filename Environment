@@ -1,0 +1,101 @@
+
+# printf "sourcing => %-25s" "Environment"
+
+# ---   history   ---
+
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=2000000
+HISTFILESIZE=2000000
+
+alias h='history'
+
+# ---   history end  ---
+
+# pro=root
+# export CDPATH=~/pro/${pro}
+# export CDPATH="$PWD/../inc"
+# echo "CDPATH -> " $CDPATH
+#
+ulimit -c unlimited
+
+export EDITOR=vi
+
+# export QT_QPA_PLATFORM=xcb
+# export PATH=.:$HOME/bin:$PATH:/opt/eclipse:/opt/gcc-15/bin:/opt/qt6/bin:/opt/qtcreator-17.0.0/bin/
+export PATH=.:$HOME/bin:$PATH
+
+. ~/.os/PS-colors-by-host
+
+#### if [ ${LOGNAME} == "root" ]
+#### then
+#### PS1='($?) ${LOGNAME}@${HOSTNAME} {${pro}} ($(_time))
+#### $PWD # '
+#### else
+#### PS1='($?) ${LOGNAME}@${HOSTNAME} $PWD
+#### {${pro}} ($(_time)) $ '
+#### fi
+
+
+if [ $(uname --machine) == "aarch64" ]   # Raspberry!
+then
+  alias t="vcgencmd measure_temp|cut -f2 -d'='"
+else
+  alias t="sensors coretemp-isa-0000 | grep ^Package | cut -f2 -d'+'|cut -f1 -d' '"
+fi
+
+
+# -----------------------------------------------------------------------------
+# #
+# taken from origin .bash history
+# #
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+
+#@ printf "HERE\n"
+#@ case $- in
+#@     *i*) ;;
+#@       *) return;;
+#@ esac
+
+# See bash(1) for more options
+
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# printf " ... done!\n"
+

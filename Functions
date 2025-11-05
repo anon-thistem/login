@@ -11,7 +11,7 @@ function save
     if [ -d .save ]
     then
       echo ".save exists!"
-      \ls -ltr .save/
+      \ls -latr .save/
     fi
     return 1
 
@@ -29,7 +29,7 @@ function save
 
       file=${1}_$(d)
       cp -p ${1} .save/${file}
-      \ls -ltr .save/${1}*
+      \ls -latr .save/${1}*
       ret=$?
     fi
   fi
